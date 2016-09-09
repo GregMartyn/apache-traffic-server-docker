@@ -22,9 +22,9 @@ WORKDIR /usr/local/src
 
 RUN git clone https://git-wip-us.apache.org/repos/asf/trafficserver.git
 
-RUN git checkout 6.1.x
-
 WORKDIR /usr/local/src/trafficserver
+
+RUN git checkout 6.1.x
 
 RUN autoreconf -if \
 	&& ./configure --enable-experimental-plugins \
