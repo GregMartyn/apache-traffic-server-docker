@@ -24,8 +24,6 @@ RUN git clone https://git-wip-us.apache.org/repos/asf/trafficserver.git
 
 WORKDIR /usr/local/src/trafficserver
 
-RUN git checkout master
-
 RUN git checkout 6.1.x
 
 RUN autoreconf -if \
