@@ -28,9 +28,12 @@ RUN autoreconf -if \
 	&& ./configure --enable-experimental-plugins \
 	&& make -j4 \
 	&& make check \
-	&& make install
+	&& make install \
+	&& make distclean
 
-# make it easier to find the config
+WORKDIR /usr/local/bin
+
+# make it easier to find the config for anyone running a shell inside the container
 RUN ln -s /usr/local/etc/trafficserver /etc/trafficserver
 RUN ln -s /usr/local/bin/trafficserver /etc/init.d/trafficserver
 RUN ln -s /usr/local/var/log/trafficserver /var/log/trafficserver
@@ -41,8 +44,10 @@ RUN ln -s /usr/local/var/log/trafficserver /var/log/trafficserver
 
 # records.config
 
+# enable http2
 RUN sed -i 's/CONFIG proxy.config.http2.enabled INT 0/CONFIG proxy.config.http2.enabled INT 1/g' /etc/trafficserver/records.config
 
+# listen on port 80 and 443 for http 1 & 2 and ipv4 & ipv6
 RUN sed -i 's/CONFIG proxy.config.http.server_ports STRING 8080/CONFIG proxy.config.http.server_ports STRING 80:proto=http2;http 80:ipv6:proto=http2;http 443:proto=http2;http:ssl 443:ipv6:proto=http2;http:ssl/g' /etc/trafficserver/records.config
 
 
@@ -73,11 +78,11 @@ RUN sed -i 's/CONFIG proxy.config.http.server_ports STRING 8080/CONFIG proxy.con
 
 # storage.config
 
+# increase the cache size from 256M => 5G
 RUN sed -i 's#var/trafficserver 256M#var/trafficserver 5G#g' /etc/trafficserver/storage.config
 
-
+VOLUME ["/usr/local/etc/trafficserver", "/usr/local/var/log/trafficserver"]
 
 EXPOSE 80 443
 
-#ENTRYPOINT bin/trafficserver start
-CMD ["/usr/local/bin/traffic_cop"]
+ENTRYPOINT ["/usr/local/bin/traffic_cop"]
