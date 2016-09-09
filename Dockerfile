@@ -8,7 +8,7 @@ WORKDIR /tmp
 # putting && on next line, because then it's more obvious that
 # the new line is a separate command
 RUN dnf -y upgrade \
-    && dnf clean packages
+	&& dnf clean packages
 
 # https://cwiki.apache.org/confluence/display/TS/Fedora
 # build dependencies
@@ -16,13 +16,15 @@ RUN dnf -y install make pkgconfig gcc-c++ openssl-devel tcl-devel expat-devel pc
 		libcap libcap-devel hwloc hwloc-devel ncurses-devel libcurl-devel \
 		libunwind libunwind-devel \
 		git autoconf automake libtool \
-    && dnf clean packages
+	&& dnf clean packages
 
 WORKDIR /usr/local/src
 
 RUN git clone https://git-wip-us.apache.org/repos/asf/trafficserver.git
 
 WORKDIR /usr/local/src/trafficserver
+
+RUN git checkout master
 
 RUN autoreconf -if \
 	&& ./configure --enable-experimental-plugins \
